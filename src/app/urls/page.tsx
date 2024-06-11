@@ -1,14 +1,17 @@
 import Link from "next/link";
 
 async function fetchUrls() {
-    console.log(`${process.env.NEXT_PUBLIC_BASE_URL}/api/urls`)
+    console.log(`Base URL: ${process.env.NEXT_PUBLIC_BASE_URL}`);
     const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/urls`, {
-        cache: 'force-cache'
+        cache: 'no-store'
     });
-    if(!response.ok) {
+    console.log(`Response Status: ${response.status}`);
+    const data = await response.json();
+    console.log('Response Data:', data);
+    if (!response.ok) {
         throw new Error('Failed to fetch urls');
     }
-    return response.json()
+    return data;
 } 
 
 export default async function UrlList() {
@@ -17,11 +20,11 @@ export default async function UrlList() {
         urls = await fetchUrls();
         console.log(urls)
     } catch(error) {
-        console.log(error);
+        console.error(error);
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-100">
                 <div className="p-10 bg-white rounded-lg shadow-2xl max-w-4xl w-full">
-                    <h1 className="text-3xl font-bold mg-6 text-center text-gray-700">Error</h1>
+                    <h1 className="text-3xl font-bold mb-6 text-center text-gray-700">Error</h1>
                     <p className="text-center text-red-500">Failed to load urls</p>
                 </div>
             </div>
@@ -34,22 +37,14 @@ export default async function UrlList() {
                 <h1 className="text-3xl font-bold mb-6 text-center text-gray-700">All Short Urls</h1>
                 <Link href="/" className="text-gray-800"> Go To Home</Link>
                 <div className="overflow-x-auto">
-
                     <table className="table table-zebra w-full">
-
                         <thead>
                             <tr>
-                                <th>
-                                    Oringinal URL
-                                </th>
-                                <th>
-                                    Short URL
-                                </th>
+                                <th>Original URL</th>
+                                <th>Short URL</th>
                             </tr>
                         </thead>
-
                         <tbody>
-
                             {urls.urls && urls.urls.map((url: {_id: string, originalUrl: string, shortUrl: string}) => {
                                 return (
                                     <tr key={url._id}>
@@ -66,16 +61,10 @@ export default async function UrlList() {
                                     </tr>
                                 )
                             })}
-
                         </tbody>
-
                     </table>
-
                 </div>
-
-
             </div>
-
         </div>
     )
 }
